@@ -44,6 +44,30 @@ function render(element, container){
     container.appendChild(dom)
 }
 
+let nextUnitOfWork = null
+
+/* We're refactoring the recursive call because it wont stop unless element tree is fully rendered, problem with
+that is that it may block main thread for too long. if browser needs to do high priority stuff, it would have to
+wait until render finishes. 
+
+breakdown into smaller chunks. workloop.  requestIdleCallback is no longer used in the official React, they now use
+a scheduler package.  But conceptually "requestIdleCallback" would be the same.
+*/
+function workLoop(deadline){
+    let shouldYield = false
+    while(nextUnitOfWork && !shouldYield){
+        nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+        shouldYield = deadline.timeRemaining() < 1
+    }
+    requestIdleCallback(workLoop)
+}
+
+requestIdleCallback(workLoop)
+
+function performUnitOfWork(nextUnitOfWork){
+    // TODO
+}
+
 const Rehackt = {
     createElement,
     render,
