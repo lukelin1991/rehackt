@@ -22,9 +22,17 @@ function createTextElement(text){
     }
 }
 
-const element = React.createElement(
+const Rehackt = {
+    createElement,
+}
+
+/** @jsx Rehackt.createElement */
+const element = Rehackt.createElement(
     "div",
     { id: "foo" },
-    React.createElement("a", null, "bar"),
-    React.createElement("b")
+    Rehackt.createElement("a", null, "bar"),
+    Rehackt.createElement("b")
 )
+
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
