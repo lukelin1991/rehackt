@@ -29,19 +29,25 @@ function createTextElement(text){
     }
 }
 
-function render(element, container){
-    // TODO create dom nodes
-    const dom = element.type == "TEXT_ELEMENT" ? document.createTextNode("") : document.createElement(element.type)
-
+function createDom(fiber){
+    const dom = fiber.type == "TEXT_ELEMENT" ? document.createTextNode("") : document.createElement(fiber.type)
     const isProperty = key => key !== "children"
-    Object.keys(element.props).filter(isProperty).forEach(name => {
-        dom[name] = element.props[name]
+
+    Object.keys(fiber.props).filter(isProperty).forEach(name => {
+        dom[name] = fiber.props[name]
     })
 
-    element.props.children.forEach(child =>
-        render(child, dom)
-    )
-    container.appendChild(dom)
+    return dom
+}
+
+function render(element, container){
+    // TODO create dom nodes
+    nextUnitOfWork = {
+        dom: container,
+        props: {
+            children: [element],
+        }
+    }
 }
 
 let nextUnitOfWork = null
@@ -53,6 +59,7 @@ wait until render finishes.
 breakdown into smaller chunks. workloop.  requestIdleCallback is no longer used in the official React, they now use
 a scheduler package.  But conceptually "requestIdleCallback" would be the same.
 */
+
 function workLoop(deadline){
     let shouldYield = false
     while(nextUnitOfWork && !shouldYield){
