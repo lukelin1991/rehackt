@@ -40,7 +40,12 @@ function createDom(fiber){
     return dom
 }
 
+function updateDom(dom, prevProps, nextProps){
+    // TODO
+}
+
 function commitRoot(){
+    deletions.forEach(commitWork)
     commitWork(wipRoot.child)
     currentRoot = wipRoot
     wipRoot = null
@@ -51,7 +56,14 @@ function commitWork(fiber){
         return
     }
     const domParent = fiber.parent.dom
-    domParent.appendChild(fiber.dom)
+    if(fiber.effectTag === "PLACEMENT" && fiber.dom != null){
+        domParent.appendChild(fiber.dom)
+    } else if(fiber.effectTag === "UPDATE" && fiber.dom != null){
+        updateDom(fiber.dom, fiber.alternate.props, fiber.props)
+    } else if(fiber.effectTag === "DELETION"){
+        domParent.removeChild(fiber.dom)
+    }
+
     commitWork(fiber.child)
     commitWork(fiber.sibling)
 }
@@ -65,12 +77,14 @@ function render(element, container){
         },
         alternate: currentRoot,
     }
+    deletions = []
     nextUnitOfWork = wipRoot
 }
 
 let currentRoot = null
 let nextUnitOfWork = null
 let wipRoot = null
+let deletions = null
 
 /* We're refactoring the recursive call because it wont stop unless element tree is fully rendered, problem with
 that is that it may block main thread for too long. if browser needs to do high priority stuff, it would have to
@@ -127,12 +141,36 @@ function reconcileChildren(wipFiber, elements){
 
         if(sameType){
             // TODO update the node
+            newFiber = {
+                type: oldFiber.type,
+                props: element.props,
+                dom: oldFiber.dom,
+                parent: wipFiber,
+                alternate: oldFiber,
+                effectTag: "UPDATE",
+            }
         }
         if(element && !sameType){
             // TODO add this node
+            newFiber = {
+                type: element.type,
+                props: element.props,
+                dom: null,
+                parent: wipFiber,
+                alternate: null,
+                effectTag: "PLACEMENT",
+            }
         }
         if(oldFiber && !sameType){
             // TODO  delete the oldFiber's node
+            oldFiber.effectTag = "DELETION"
+            deletions.push(oldFiber)
+        }
+        if(oldFiber){
+            oldFiber = oldFiber.sibling
+        }
+        if(idx === 0){
+            wipFiber.child = newFiber
         }
     }
 }
