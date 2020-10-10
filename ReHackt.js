@@ -40,17 +40,37 @@ function createDom(fiber){
     return dom
 }
 
+function commitRoot(){
+    commitWork(wipRoot.child)
+    currentRoot = wipRoot
+    wipRoot = null
+}
+
+function commitWork(fiber){
+    if(!fiber){
+        return
+    }
+    const domParent = fiber.parent.dom
+    domParent.appendChild(fiber.dom)
+    commitWork(fiber.child)
+    commitWork(fiber.sibling)
+}
+
 function render(element, container){
     // TODO create dom nodes
-    nextUnitOfWork = {
+    wipRoot = {
         dom: container,
         props: {
             children: [element],
-        }
+        },
+        alternate: currentRoot,
     }
+    nextUnitOfWork = wipRoot
 }
 
+let currentRoot = null
 let nextUnitOfWork = null
+let wipRoot = null
 
 /* We're refactoring the recursive call because it wont stop unless element tree is fully rendered, problem with
 that is that it may block main thread for too long. if browser needs to do high priority stuff, it would have to
@@ -76,32 +96,44 @@ function performUnitOfWork(fiber){
     if(!fiber.dom){
         fiber.dom = createDom(fiber)
     }
-    if(fiber.parent){
-        fiber.parent.dom.appendChild(fiber.dom)
-    }
 
     const elements = fiber.props.children
+    reconcileChildren(fiber, elements)
+
+    if (fiber.child){
+        return fiber.child
+    }
+
+    let nextFiber = fiber
+    while(nextFiber){
+        if(nextFiber.sibling){
+            return nextFiber.sibling
+        }
+        nextFiber = nextFiber.parent
+    }
+}
+
+function reconcileChildren(wipFiber, elements){
     let idx = 0
+    let oldFiber = wipFiber.alternate && wipFiber.alternate.child
     let prevSibling = null
 
-    while(idx < elements.length){
+    while(idx < elements.length || oldFiber != null){
         const element = elements[idx]
 
-        const newFiber = {
-            type: element.type,
-            props: element.props,
-            parent: fiber,
-            dom: null,
-        }
+        let newFiber = null
 
-        if(idx === 0){
-            fiber.child = newFiber
-        } else {
-            prevSibling.sibling = newFiber
-        }
+        const sameType = oldFiber && element && element.type == oldFiber.type
 
-        prevSibling = newFiber
-        idx++
+        if(sameType){
+            // TODO update the node
+        }
+        if(element && !sameType){
+            // TODO add this node
+        }
+        if(oldFiber && !sameType){
+            // TODO  delete the oldFiber's node
+        }
     }
 }
 
