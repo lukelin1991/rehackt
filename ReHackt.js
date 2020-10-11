@@ -248,23 +248,31 @@ function reconcileChildren(wipFiber, elements){
         }
         if(idx === 0){
             wipFiber.child = newFiber
+        } else if(element){
+            prevSibling.sibling = newFiber
         }
+
+        prevSibling = newFiber
+        idx++
     }
 }
 
 const Rehackt = {
     createElement,
     render,
+    useState,
 }
 
 /** @jsx Rehackt.createElement */
-const element = Rehackt.createElement(
-    "div",
-    { id: "foo" },
-    Rehackt.createElement("a", null, "bar"),
-    Rehackt.createElement("b")
-)
+function Counter(){
+    const [state, setState] = Rehackt.useState(1)
+    return(
+        <h1 onClick={() => setState(c => c + 1)}>
+            Count: {state}
+        </h1>
+    )
+}
 
-
+const element = <Counter />
 const container = document.getElementById("root")
 Rehackt.render(element, container)
