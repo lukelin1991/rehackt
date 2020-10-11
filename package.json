@@ -1,0 +1,12 @@
+{
+  "name": "rehackt",
+  "version": "3.0.0",
+  "description": "A cloned hacked alternative to React",
+  "license": "none",
+  "repository": "lukelin1991/rehackt",
+  "author": "lukelin1991",
+  "main": "rehackt.js",
+  "keywords": [
+    "react"
+  ]
+}
