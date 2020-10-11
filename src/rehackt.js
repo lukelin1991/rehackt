@@ -316,9 +316,12 @@ function Counter(){
     }, [state])
 
     return(
-        <h1 onClick={() => setState(c => c + 1)}>
-            Count: {state}
-        </h1>
+        <div>
+            <h1>My first ReHackt App</h1>
+             <h1 onClick={() => setState(c => c + 1)}>
+                Count: {state}
+            </h1>
+        </div>
     )
 }
 
