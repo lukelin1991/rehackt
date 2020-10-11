@@ -30,7 +30,7 @@ function createTextElement(text){
 }
 
 function createDom(fiber){
-    const dom = fiber.type == "TEXT_ELEMENT" ? document.createTextNode("") : document.createElement(fiber.type)
+    const dom = fiber.type === "TEXT_ELEMENT" ? document.createTextNode("") : document.createElement(fiber.type)
     updateDom(dom, {}, fiber.props)
     return dom
 }
@@ -96,7 +96,7 @@ function commitWork(fiber){
     if(!fiber){
         return
     }
-    let domParentFiber = domParentFiber.fiber
+    let domParentFiber = fiber.parent
     while(!domParentFiber.dom){
         domParentFiber = domParentFiber.parent
     }
@@ -258,7 +258,7 @@ function reconcileChildren(wipFiber, elements){
         const element = elements[idx]
         let newFiber = null
 
-        const sameType = oldFiber && element && element.type == oldFiber.type
+        const sameType = oldFiber && element && element.type === oldFiber.type
 
         if(sameType){
             // TODO update the node
