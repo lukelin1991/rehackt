@@ -39,9 +39,24 @@ function createDom(fiber){
 
     return dom
 }
+const isEvent = key => key.startsWith("on")
+const isProperty = key => key !== "children" && !isEvent(key)
+const isNew = (prev, next) => key => prev[key] !== next[key]
+const isGone = (prev, next) => key => !(key in next)
 
 function updateDom(dom, prevProps, nextProps){
-    // TODO
+    // remove old properties
+    Object.keys(prevProps)
+    .filter(isProperty)
+    .filter(isGone(prevProps, nextProps))
+    .forEach(name => {
+        dom[name] = ""
+    })
+
+    //set new or changed properties
+    Object.keys(nextProps).filter(isProperty).filter(isNew(prevProps, nextProps)).forEach(name => {
+        dom[name] = nextProps[name]
+    })
 }
 
 function commitRoot(){
