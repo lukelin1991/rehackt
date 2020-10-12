@@ -10,7 +10,7 @@ KEY INGREDIENTS TO BUILDING REACT!
 MAIN DIFFERENCES BETWEEN REHACKT & REACT!!
 - In a real React Application, you will be able to see the "workLoop", "performUnitOfWork", and "updateFunctionComponent".
 
--ReHackt has to walk through the entire tree from "root" during the render phase, whereas React can skip entire 
+- ReHackt has to walk through the entire tree from "root" during the render phase, whereas React can skip entire 
 sub-trees due to creating linked list relationships which can skip things that are unchanged.
 
 - when ReHackt receives a new update during the render phase, it starts its starts all over again from the root, 
